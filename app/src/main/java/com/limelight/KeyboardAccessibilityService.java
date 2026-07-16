@@ -3,6 +3,8 @@ package com.limelight;
 import android.accessibilityservice.AccessibilityService;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
+import android.media.AudioManager;
+import android.content.Context;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,10 +30,24 @@ public class KeyboardAccessibilityService extends AccessibilityService {
         boolean isRealKeyboard = (device != null && device.getKeyboardType() == android.view.InputDevice.KEYBOARD_TYPE_ALPHABETIC);
         
         // 키보드가 아닌 기기(태블릿 본체)에서 누른 볼륨 버튼은 가로채지 않고 통과!
-        if (!isRealKeyboard && (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+        if (!isRealKeyboard && (keyCode == 24 || keyCode == 25)) {
             return super.onKeyEvent(event); 
         }
         // ▲▲▲ 추가 끝 ▲▲▲
+
+        // 65=이메일(Fn+F9), 210=계산기(Fn+F10) ➔ 안드로이드 볼륨 조절로 리맵핑
+        if (isRealKeyboard && (keyCode == 65 || keyCode == 210)) {
+            if (action == KeyEvent.ACTION_DOWN) {
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                if (keyCode == 65) { 
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                } else if (keyCode == 210) { 
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                }
+            }
+            // 윈도우로 안 넘어가게 여기서 신호를 꿀꺽 삼킴
+            return true; 
+        }
         
         if (Game.instance != null && Game.instance.isConnected() && !BLACKLISTED_KEYS.contains(keyCode)) {
             // Preventing default will disable shortcut actions like alt+tab and etc.
