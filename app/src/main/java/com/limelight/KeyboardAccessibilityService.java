@@ -16,6 +16,12 @@ public class KeyboardAccessibilityService extends AccessibilityService {
         int action = event.getAction();
         int keyCode = event.getKeyCode();
 
+        // ▼▼▼ 여기에 스마트 포커스 조건문 3줄을 추가합니다 ▼▼▼
+        if (!Game.isMoonlightFocused) {
+            return super.onKeyEvent(event); // 가로채지 말고 안드로이드(카톡 등)로 넘겨라
+        }
+        // ▲▲▲ 추가 끝 ▲▲▲
+        
         if (Game.instance != null && Game.instance.isConnected() && !BLACKLISTED_KEYS.contains(keyCode)) {
             // Preventing default will disable shortcut actions like alt+tab and etc.
             if (action == KeyEvent.ACTION_DOWN) {
