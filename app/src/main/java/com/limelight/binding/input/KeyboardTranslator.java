@@ -163,51 +163,37 @@ public class KeyboardTranslator implements InputManager.InputDeviceListener {
         }
         else {
 
-            // ▼▼▼ 기기 판별 코드 2줄 추가 ▼▼▼
-            InputDevice currentDevice = InputDevice.getDevice(deviceId);
-            boolean isRealKeyboard = (currentDevice != null && currentDevice.getKeyboardType() == InputDevice.KEYBOARD_TYPE_ALPHABETIC);
-            // ▲▲▲ 추가 끝 ▲▲▲
-            
+            // ▼▼▼ 기기 판별 코드 ▼▼▼
+            android.view.InputDevice currentDevice = android.view.InputDevice.getDevice(deviceId);
+            boolean isRealKeyboard = (currentDevice != null && currentDevice.getKeyboardType() == android.view.InputDevice.KEYBOARD_TYPE_ALPHABETIC);
+
             switch (keycode) {
             
-                  // ▼▼▼ CK87BT 키보드 전용 F1~F12 완벽 복원 코드 ▼▼▼
-
-            case KeyEvent.KEYCODE_BRIGHTNESS_DOWN: // F1
+            // ▼▼▼ SDK 버전 무시! 원시 숫자(Raw Int)로 F1~F12 강제 복원 ▼▼▼
+            case 220: // F1 (Brightness Down)
                 if (isRealKeyboard) { translated = VK_F1; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_BRIGHTNESS_UP:   // F2
+            case 221: // F2 (Brightness Up)
                 if (isRealKeyboard) { translated = VK_F1 + 1; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_APP_SWITCH:      // F3 (Recent Apps)
+            case 187: // F3 (App Switch)
                 if (isRealKeyboard) { translated = VK_F1 + 2; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_NOTIFICATION:    // F4 
+            case 83:  // F4 (Notification)
                 if (isRealKeyboard) { translated = VK_F1 + 3; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_KBD_ILLUMINATION_DOWN: // F5 (Keyboard Backlight Down)
+            case 305: // F5 (Kbd Backlight Down)
                 if (isRealKeyboard) { translated = VK_F1 + 4; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_KBD_ILLUMINATION_UP:   // F6 (Keyboard Backlight Up)
+            case 306: // F6 (Kbd Backlight Up)
                 if (isRealKeyboard) { translated = VK_F1 + 5; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:  // F7
+            case 88:  // F7 (Media Previous)
                 if (isRealKeyboard) { translated = VK_F1 + 6; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:// F8
+            case 85:  // F8 (Media Play/Pause)
                 if (isRealKeyboard) { translated = VK_F1 + 7; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_MEDIA_NEXT:      // F9
+            case 87:  // F9 (Media Next)
                 if (isRealKeyboard) { translated = VK_F1 + 8; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_VOLUME_MUTE:     // F10
+            case 164: // F10 (Volume Mute)
                 if (isRealKeyboard) { translated = VK_F1 + 9; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_VOLUME_DOWN:     // F11
+            case 25:  // F11 (Volume Down)
                 if (isRealKeyboard) { translated = VK_F1 + 10; break; } else { return 0; }
-                
-            case KeyEvent.KEYCODE_VOLUME_UP:       // F12
+            case 24:  // F12 (Volume Up)
                 if (isRealKeyboard) { translated = VK_F1 + 11; break; } else { return 0; }
-
             // ▲▲▲ F1~F12 복원 끝 ▲▲▲
 
             // 밑으로는 기존 코드들 계속...
