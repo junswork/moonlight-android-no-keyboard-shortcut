@@ -88,10 +88,13 @@ import java.security.cert.X509Certificate;
 import java.util.Locale;
 
 
+
 public class Game extends Activity implements SurfaceHolder.Callback,
         OnGenericMotionListener, OnTouchListener, NvConnectionListener, EvdevListener,
         OnSystemUiVisibilityChangeListener, GameGestures, StreamView.InputCallbacks,
         PerfOverlayListener, UsbDriverService.UsbDriverStateListener, View.OnKeyListener {
+
+    public static boolean isMoonlightFocused = false; // ▼▼▼ 우리가 새로 추가한 스위치 ▼▼▼
 
     public static Game instance = null;
     private int lastButtonState = 0;
@@ -742,6 +745,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
+        isMoonlightFocused = hasFocus; // ▼▼▼ 터치 상태에 따라 스위치를 끄고 켜는 코드 추가 ▼▼▼
+            
         // We can't guarantee the state of modifiers keys which may have
         // lifted while focus was not on us. Clear the modifier state.
         this.modifierFlags = 0;
