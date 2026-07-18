@@ -30,8 +30,8 @@ public class KeyboardAccessibilityService extends AccessibilityService {
                 return super.onKeyEvent(event); 
             }
 
-            // 3. Fn+이메일(65) / Fn+계산기(210) ➔ 탭 볼륨 조절로 둔갑
-            if (isRealKeyboard && (keyCode == 65 || keyCode == 210)) {
+            // 3. Fn+이메일(65) / Fn+계산기(210) ➔ 탭 볼륨 조절로 둔갑, 미디어 키이므로 isRealKeyboard 검사 불필요.
+            if (keyCode == 65 || keyCode == 210) {
                 if (action == KeyEvent.ACTION_DOWN) {
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                     if (keyCode == 65) { 
