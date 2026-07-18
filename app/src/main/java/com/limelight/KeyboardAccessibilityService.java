@@ -19,47 +19,43 @@ public class KeyboardAccessibilityService extends AccessibilityService {
         int action = event.getAction();
         int keyCode = event.getKeyCode();
 
-        // ▼▼▼ 여기에 스마트 포커스 조건문 3줄을 추가합니다 ▼▼▼
-        if (!Game.isMoonlightFocused) {
-            return super.onKeyEvent(event); // 가로채지 말고 안드로이드(카톡 등)로 넘겨라
-        }
-        // ▲▲▲ 추가 끝 ▲▲▲
+        // 1. 문라이트가 켜져 있고, 현재 '정확히 터치되어 포커스를 잡고 있을 때만' 작동!
+        if (Game.instance != null && Game.instance.isConnected() && Game.instance.hasWindowFocus()) {
 
-        // ▼▼▼ 여기에 태블릿 본체 볼륨 버튼 살리기 코드 추가 ▼▼▼
-        android.view.InputDevice device = event.getDevice();
-        boolean isRealKeyboard = (device != null && device.getKeyboardType() == android.view.InputDevice.KEYBOARD_TYPE_ALPHABETIC);
-        
-        // 키보드가 아닌 기기(태블릿 본체)에서 누른 볼륨 버튼은 가로채지 않고 통과!
-        if (!isRealKeyboard && (keyCode == 24 || keyCode == 25)) {
-            return super.onKeyEvent(event); 
-        }
-        // ▲▲▲ 추가 끝 ▲▲▲
+            android.view.InputDevice device = event.getDevice();
+            boolean isRealKeyboard = (device != null && device.getKeyboardType() == android.view.InputDevice.KEYBOARD_TYPE_ALPHABETIC);
 
-        // 65=이메일(Fn+F9), 210=계산기(Fn+F10) ➔ 안드로이드 볼륨 조절로 리맵핑
-        if (isRealKeyboard && (keyCode == 65 || keyCode == 210)) {
-            if (action == KeyEvent.ACTION_DOWN) {
-                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                if (keyCode == 65) { 
-                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-                } else if (keyCode == 210) { 
-                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+            // 2. 태블릿 본체의 진짜 볼륨 버튼은 가로채지 말고 패스
+            if (!isRealKeyboard && (keyCode == 24 || keyCode == 25)) {
+                return super.onKeyEvent(event); 
+            }
+
+            // 3. Fn+이메일(65) / Fn+계산기(210) ➔ 탭 볼륨 조절로 둔갑
+            if (isRealKeyboard && (keyCode == 65 || keyCode == 210)) {
+                if (action == KeyEvent.ACTION_DOWN) {
+                    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    if (keyCode == 65) { 
+                        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                    } else if (keyCode == 210) { 
+                        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                    }
+                }
+                return true; // 윈도우로 안 넘어가게 여기서 신호를 꿀꺽!
+            }
+
+            // 4. 나머지 모든 키보드 입력은 원격 PC로 전송
+            if (!BLACKLISTED_KEYS.contains(keyCode)) {
+                if (action == KeyEvent.ACTION_DOWN) {
+                    Game.instance.handleKeyDown(event);
+                    return true;
+                } else if (action == KeyEvent.ACTION_UP) {
+                    Game.instance.handleKeyUp(event);
+                    return true;
                 }
             }
-            // 윈도우로 안 넘어가게 여기서 신호를 꿀꺽 삼킴
-            return true; 
-        }
-        
-        if (Game.instance != null && Game.instance.isConnected() && !BLACKLISTED_KEYS.contains(keyCode)) {
-            // Preventing default will disable shortcut actions like alt+tab and etc.
-            if (action == KeyEvent.ACTION_DOWN) {
-                Game.instance.handleKeyDown(event);
-                return true;
-            } else if (action == KeyEvent.ACTION_UP) {
-                Game.instance.handleKeyUp(event);
-                return true;
-            }
         }
 
+        // 5. 문라이트 포커스 아웃 상태이거나, 위 조건에 해당하지 않으면 안드로이드(카톡 등)로 키보드 신호 정상 반환!
         return super.onKeyEvent(event);
     }
 
