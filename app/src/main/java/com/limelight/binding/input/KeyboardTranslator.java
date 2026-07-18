@@ -175,7 +175,7 @@ public class KeyboardTranslator implements InputManager.InputDeviceListener {
             case 221: // F2 (Brightness Up)
                 if (isRealKeyboard) { translated = VK_F1 + 1; break; } else { return 0; }
             case 187: // F3 (App Switch)
-                if (isRealKeyboard) { translated = VK_F1 + 2; break; } else { return 0; }
+                translated = VK_F1 + 2; break;
             case 83:  // F4 (Notification)
                 if (isRealKeyboard) { translated = VK_F1 + 3; break; } else { return 0; }
             case 305: // F5 (Kbd Backlight Down)
